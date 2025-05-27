@@ -1,0 +1,133 @@
+-- Create the database
+CREATE DATABASE EventsManagement;
+
+-- Create Events table
+CREATE TABLE Events (
+    Event_Id SERIAL PRIMARY KEY,
+    Event_Name VARCHAR(100) NOT NULL,
+    Event_Date DATE NOT NULL,
+    Event_Location VARCHAR(100),
+    Event_Description TEXT
+);
+
+-- Create Attendees table
+CREATE TABLE Attendees (
+    Attendee_Id SERIAL PRIMARY KEY,
+    Attendee_Name VARCHAR(100) NOT NULL,
+    Attendee_Phone VARCHAR(15),
+    Attendee_Email VARCHAR(100),
+    Attendee_City VARCHAR(50)
+);
+
+-- Create Registrations table
+CREATE TABLE Registrations (
+    Registration_Id SERIAL PRIMARY KEY,
+    Event_Id INT REFERENCES Events(Event_Id) ON DELETE CASCADE,
+    Attendee_Id INT REFERENCES Attendees(Attendee_Id) ON DELETE CASCADE,
+    Registration_Date DATE NOT NULL,
+    Registration_Amount NUMERIC(10,2)
+);
+
+--- Sample Data Insertion
+-- Insert sample events
+INSERT INTO Events (Event_Name, Event_Date, Event_Location, Event_Description)
+VALUES 
+('Tech Conference', '2025-07-15', 'New York', 'Technology and Innovation Conference'),
+('Art Festival', '2025-08-20', 'Los Angeles', 'Celebration of Modern Art'),
+('Startup Meetup', '2025-06-05', 'San Francisco', 'Networking event for startups');
+
+select *from Events;
+
+
+-- Insert sample attendees
+
+INSERT INTO Attendees (Attendee_Name, Attendee_Phone, Attendee_Email, Attendee_City)
+VALUES
+('Jays', '1234567890', 'jays@example.com', 'Chandigarh'),
+('Backy', '0987654321', 'backy@example.com', 'Delhi'),
+('Baku', '4567891230', 'baku@example.com', 'Bengaluru');
+
+-- Insert sample registrations
+INSERT INTO Registrations (Event_Id, Attendee_Id, Registration_Date, Registration_Amount)
+VALUES
+(1, 1, '2025-06-01', 100.00),
+(2, 2, '2025-07-01', 50.00),
+(3, 3, '2025-05-15', 75.00);
+
+--Manage Event Details
+
+INSERT INTO Events (Event_Name, Event_Date, Event_Location, Event_Description)
+VALUES ('DJ Ray', '2025-09-10', 'America', 'Annual music carnival');
+
+select *from Events;
+
+--- Update an Event
+
+UPDATE Events
+SET Event_Location = 'New Delhi', Event_Date = '2025-09-19'
+WHERE Event_Name = 'DJ Ray';
+select *from Events;
+
+---Delete an Event
+
+DELETE FROM Events
+WHERE Event_Name = 'DJ Ray';
+
+--- Manage Attendees & Event Registrations
+
+INSERT INTO Attendees (Attendee_Name, Attendee_Phone, Attendee_Email, Attendee_City)
+VALUES ('Akash', '3216549870', 'akash@example.com', 'Chennai');
+
+select *from Attendees;
+
+--- Register an Attendee for an Event
+
+INSERT INTO Registrations (Event_Id, Attendee_Id, Registration_Date, Registration_Amount)
+VALUES (1, 4, CURRENT_DATE, 220.00);
+select *from Registrations;
+
+
+--------List All Events with Attendee Counts
+
+SELECT e.Event_Name, e.Event_Date, COUNT(r.Attendee_Id) AS Total_Attendees
+FROM Events e
+LEFT JOIN Registrations r ON e.Event_Id = r.Event_Id
+GROUP BY e.Event_Id;
+
+---Attendee List for a Specific Event
+
+SELECT a.Attendee_Name, a.Attendee_Email, a.Attendee_City
+FROM Attendees a
+JOIN Registrations r ON a.Attendee_Id = r.Attendee_Id
+WHERE r.Event_Id = 2;  
+
+--- event Revenue statistics.
+
+SELECT e.Event_Name, SUM(r.Registration_Amount) AS Total_Revenue
+FROM Events e
+JOIN Registrations r ON e.Event_Id = r.Event_Id
+GROUP BY e.Event_Id;
+
+----- Events with No Registrations
+
+SELECT e.Event_Name
+FROM Events e
+LEFT JOIN Registrations r ON e.Event_Id = r.Event_Id
+WHERE r.Event_Id IS NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
